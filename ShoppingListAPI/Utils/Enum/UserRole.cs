@@ -1,11 +1,12 @@
-﻿namespace ShoppingListAPI.Utils.Enum
+﻿using System.ComponentModel;
+
+namespace ShoppingListAPI.Utils
 {
-    [Flags]
     public enum UserRole
     {
-        Create = 1,
-        Update = 2,
-        Read = 4,
-        Delete = 8
+        [Description("Admin")]
+        Admin = 1,
+        [Description("User")]
+        User = 2
     }
 }

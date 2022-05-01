@@ -1,4 +1,4 @@
-﻿using ShoppingListAPI.Utils.Enum;
+﻿using ShoppingListAPI.Utils;
 using System.Text.Json.Serialization;
 
 namespace ShoppingListAPI.Models

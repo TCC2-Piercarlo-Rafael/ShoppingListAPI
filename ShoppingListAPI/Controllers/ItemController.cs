@@ -1,31 +1,33 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ShoppingListAPI.Dtos;
 using ShoppingListAPI.Models;
-using ShoppingListAPI.Repositories;
+using ShoppingListAPI.Services.ItemService;
 
 namespace ShoppingListAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin, User")]
     public class ItemController : ControllerBase
     {
-        private readonly IRepository<Item> _repository;
+        private readonly IItemService _itemService;
 
-        public ItemController(IRepository<Item> repository)
+        public ItemController(IItemService itemService)
         {
-            _repository = repository;
+            _itemService = itemService;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Item>>> Get()
         {
-            return Ok(await _repository.GetAll());
+            return Ok(_itemService.Get());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Item>> GetById(Guid id)
         {
-            var item = await _repository.GetById(id);
+            var item = _itemService.GetById(id);
 
             if(item == null)
                 return BadRequest("Item not found");
@@ -34,17 +36,17 @@ namespace ShoppingListAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Item>>> Add(Item item)
+        public async Task<ActionResult<List<Item>>> Add(ItemDto request)
         {
-            _repository.Add(item);
+            _itemService.Add(request);
 
-            return Ok(await _repository.GetAll());
+            return Ok(_itemService.Get());
         }
 
         [HttpPut]
         public async Task<ActionResult<List<Item>>> Update(Item request)
         {
-            var item = await _repository.GetById(request.Id);
+            var item = _itemService.GetById(request.Id);
 
             if (item == null)
                 return BadRequest("Item not found");
@@ -52,22 +54,22 @@ namespace ShoppingListAPI.Controllers
             item.Description = request.Description;
             item.Complete = request.Complete;
 
-            _repository.Update(item);
+            _itemService.Update(item);
 
-            return Ok(await _repository.GetAll());
+            return Ok(_itemService.Get());
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<List<Item>>> Delete(Guid id)
         {
-            var item = await _repository.GetById(id);
+            var item = _itemService.GetById(id);
 
             if (item == null)
                 return BadRequest("Item not found");
 
-            _repository.Delete(item);
+            _itemService.Update(item);
 
-            return Ok(await _repository.GetAll());
+            return Ok(_itemService.Get());
         }
     }
 }

@@ -7,6 +7,7 @@
         void Update(TEntity entity);
         void Delete(TEntity entity);
         Task<TEntity> GetById(Guid id);
-        Task<IEnumerable<TEntity>> GetAll();
+        IEnumerable<TEntity> GetAll();
+        IEnumerable<TEntity> GetAll(Func<TEntity, bool> lambda);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace ShoppingListAPI.Repositories
+﻿using System.Linq.Expressions;
+
+namespace ShoppingListAPI.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity>
         where TEntity : class
@@ -21,16 +23,23 @@
         public void Add(TEntity entity)
         {
             DbSet.Add(entity);
+            _context.SaveChanges();
         }
 
         public void Delete(TEntity entity)
         {
             DbSet.Remove(entity);
+            _context.SaveChanges();
         }
 
-        public async Task<IEnumerable<TEntity>> GetAll()
+        public IEnumerable<TEntity> GetAll()
         {
-            return await DbSet.ToListAsync();
+            return DbSet.ToList();
+        }
+
+        public IEnumerable<TEntity> GetAll(Func<TEntity, bool> lambda)
+        {
+            return DbSet.Where(lambda).ToList();
         }
 
         public async Task<TEntity> GetById(Guid id)
@@ -41,6 +50,7 @@
         public void Update(TEntity entity)
         {
             DbSet.Update(entity);
+            _context.SaveChanges();
         }
     }
 }
