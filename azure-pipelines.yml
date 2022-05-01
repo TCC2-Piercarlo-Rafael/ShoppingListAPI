@@ -15,6 +15,13 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'ShoppingListAPISonarToken'
+    organization: 'rafaelcunhafs'
+    scannerMode: 'MSBuild'
+    projectKey: 'rafaelcunhafs_ShoppingListAPI'
+    projectName: 'TCC-RAFAEL'
 - task: NuGetToolInstaller@1
 
 - task: NuGetCommand@2
@@ -27,6 +34,12 @@ steps:
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: SonarCloudAnalyze@1
+
+- task: SonarCloudPublish@1
+  inputs:
+    pollingTimeoutSec: '300'
 
 - task: VSTest@2
   inputs:
