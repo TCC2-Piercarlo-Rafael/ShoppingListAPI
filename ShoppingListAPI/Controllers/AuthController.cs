@@ -24,12 +24,6 @@ namespace ShoppingListAPI.Controllers
             _repository = repository;
         }
 
-        [HttpGet, Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<User>>> Get()
-        {
-            return Ok(_repository.GetAll());
-        }
-
         [HttpPost("register")]
         public ActionResult<User> Register(UserDto request)
         {
@@ -58,34 +52,6 @@ namespace ShoppingListAPI.Controllers
 
             string token = CreateToken(user);
             return Ok(token);
-        }
-
-        [HttpPut("upgrade/{id}"), Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<User>>> Upgrade(Guid id)
-        {
-            var user = await _repository.GetById(id);
-
-            if (user == null)
-                return BadRequest("User not found");
-
-            user.Roles = UserRole.Admin;
-
-            _repository.Update(user);
-
-            return Ok(_repository.GetAll());
-        }
-
-        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<Category>>> Delete(Guid id)
-        {
-            var user = await _repository.GetById(id);
-
-            if (user == null)
-                return BadRequest("User not found");
-
-            _repository.Delete(user);
-
-            return Ok(_repository.GetAll());
         }
 
         private string CreateToken(User user)
