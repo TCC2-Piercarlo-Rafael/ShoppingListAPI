@@ -5,6 +5,11 @@ namespace ShoppingListAPI.Models
 {
     public class User
     {
+        public User()
+        {
+            Categories = new List<Category>();
+        }
+
         public Guid Id { get; set; }
         public string Name { get; set; } = String.Empty;
         public string Password { get; set; } = String.Empty;

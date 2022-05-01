@@ -4,14 +4,20 @@ namespace ShoppingListAPI.Models
 {
     public class Category
     {
+        public Category()
+        {
+            Items = new List<Item>();
+        }
+
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public string Description { get; set; } = String.Empty;
 
         [JsonIgnore]
-        public User User { get; set; }
+        public virtual User User { get; set; }
+
         [JsonIgnore]
-        public List<Item> Items { get; set; }
+        public virtual List<Item> Items { get; set; }
 
     }
 }

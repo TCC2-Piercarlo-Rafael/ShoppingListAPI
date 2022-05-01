@@ -10,6 +10,6 @@ namespace ShoppingListAPI.Models
         public bool Complete { get; set; }
 
         [JsonIgnore]
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
     }
 }
