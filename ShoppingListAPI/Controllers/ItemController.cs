@@ -19,24 +19,24 @@ namespace ShoppingListAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Item>>> Get()
+        public ActionResult<List<Item>> Get()
         {
             return Ok(_itemService.Get());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetById(Guid id)
+        public ActionResult<Item> GetById(Guid id)
         {
             var item = _itemService.GetById(id);
 
-            if(item == null)
+            if (item == null)
                 return BadRequest("Item not found");
 
             return Ok(item);
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Item>>> Add(ItemDto request)
+        public ActionResult<List<Item>> Add(ItemDto request)
         {
             _itemService.Add(request);
 
@@ -44,7 +44,7 @@ namespace ShoppingListAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<List<Item>>> Update(Item request)
+        public ActionResult<List<Item>> Update(Item request)
         {
             var item = _itemService.GetById(request.Id);
 
@@ -60,14 +60,14 @@ namespace ShoppingListAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<List<Item>>> Delete(Guid id)
+        public ActionResult<List<Item>> Delete(Guid id)
         {
             var item = _itemService.GetById(id);
 
             if (item == null)
                 return BadRequest("Item not found");
 
-            _itemService.Update(item);
+            _itemService.Delete(item);
 
             return Ok(_itemService.Get());
         }

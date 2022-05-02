@@ -1,27 +1,27 @@
 ﻿using ShoppingListAPI.Dtos;
 using ShoppingListAPI.Models;
-using ShoppingListAPI.Repositories;
 
 namespace ShoppingListAPI.Services.CategoryService
 {
     public class CategoryService : ICategoryService
     {
-        private readonly IRepository<Category> _repository;
         private readonly IUserService _userService;
-        public CategoryService(IRepository<Category> repository, IUserService userService)
+        private readonly DataContext _context;
+
+        public CategoryService(DataContext context, IUserService userService)
         {
-            _repository = repository;
+            _context = context;
             _userService = userService;
         }
 
         public List<Category> Get()
         {
-            return _repository.GetAll(c => c.UserId == _userService.GetId()).ToList();
+            return _context.Categories.Where(c => c.UserId == _userService.GetId()).ToList();
         }
 
         public Category GetById(Guid id)
         {
-            return _repository.GetById(id).Result;
+            return _context.Categories.Find(id);
         }
 
         public void Add(CategoryDto request)
@@ -33,17 +33,20 @@ namespace ShoppingListAPI.Services.CategoryService
                 Description = request.Description,
             };
 
-            _repository.Add(category);
+            _context.Categories.Add(category);
+            _context.SaveChanges();
         }
 
         public void Update(Category category)
         {
-            _repository.Update(category);
+            _context.Categories.Update(category);
+            _context.SaveChanges();
         }
 
         public void Delete(Category category)
         {
-            _repository.Delete(category);
+            _context.Categories.Remove(category);
+            _context.SaveChanges();
         }
     }
 }

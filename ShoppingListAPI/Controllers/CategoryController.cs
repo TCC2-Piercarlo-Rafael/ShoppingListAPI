@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ShoppingListAPI.Dtos;
 using ShoppingListAPI.Models;
-using ShoppingListAPI.Repositories;
 using ShoppingListAPI.Services.CategoryService;
 
 namespace ShoppingListAPI.Controllers
@@ -20,13 +19,13 @@ namespace ShoppingListAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Category>>> Get()
+        public ActionResult<List<Category>> Get()
         {
             return Ok(_categoryService.Get());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> GetById(Guid id)
+        public ActionResult<Category> GetById(Guid id)
         {
             var Category = _categoryService.GetById(id);
 
@@ -37,7 +36,7 @@ namespace ShoppingListAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Category>>> Add(CategoryDto request)
+        public ActionResult<List<Category>> Add(CategoryDto request)
         {
             _categoryService.Add(request);
 
@@ -45,7 +44,7 @@ namespace ShoppingListAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<List<Category>>> Update(Category request)
+        public ActionResult<List<Category>> Update(Category request)
         {
             var category = _categoryService.GetById(request.Id);
 
@@ -60,7 +59,7 @@ namespace ShoppingListAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<List<Category>>> Delete(Guid id)
+        public ActionResult<List<Category>> Delete(Guid id)
         {
             var category = _categoryService.GetById(id);
 

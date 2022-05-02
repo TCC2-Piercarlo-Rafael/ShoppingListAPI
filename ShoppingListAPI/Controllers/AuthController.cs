@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using ShoppingListAPI.Dtos;
 using ShoppingListAPI.Models;
-using ShoppingListAPI.Repositories;
-using ShoppingListAPI.Services.UserService;
 using ShoppingListAPI.Utils;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,34 +13,26 @@ namespace ShoppingListAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IRepository<User> _repository;
         private readonly IConfiguration _configuration;
+        private readonly IUserService _userService;
 
-        public AuthController(IConfiguration configuration, IRepository<User> repository)
+        public AuthController(IConfiguration configuration, IUserService userService)
         {
             _configuration = configuration;
-            _repository = repository;
+            _userService = userService;
         }
 
         [HttpPost("register")]
         public ActionResult<User> Register(UserDto request)
         {
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                Password = request.Password,
-                Roles = UserRole.User
-            };
-
-            _repository.Add(user);
-            return Ok(user);
+            _userService.Add(request);
+            return Ok(request);
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login(UserDto request)
+        public ActionResult<string> Login(UserDto request)
         {
-            var users = _repository.GetAll(u => u.Name == request.Name);
+            var users = _userService.GetFiltered(u => u.Name == request.Name);
             if (!users.Any())
                 return BadRequest("User not found.");
 
@@ -60,7 +50,8 @@ namespace ShoppingListAPI.Controllers
             {
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Sid, user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.Roles.GetDescription())
+                new Claim(ClaimTypes.Role, user.Roles.GetDescription()),
+                new Claim(ClaimTypes.Authentication, user.Password)
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(

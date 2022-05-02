@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingListAPI.Models;
-using ShoppingListAPI.Repositories;
-using ShoppingListAPI.Utils;
 
 namespace ShoppingListAPI.Controllers
 {
@@ -12,25 +9,23 @@ namespace ShoppingListAPI.Controllers
     [Authorize(Roles = "Admin")]
     public class UserController : ControllerBase
     {
-        private readonly IRepository<User> _repository;
-        private readonly IConfiguration _configuration;
+        private readonly IUserService _userService;
 
-        public UserController(IConfiguration configuration, IRepository<User> repository)
+        public UserController(IUserService userService)
         {
-            _configuration = configuration;
-            _repository = repository;
+            _userService = userService;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<User>>> Get()
         {
-            return Ok(_repository.GetAll());
+            return Ok(_userService.Get());
         }
 
         [HttpPut]
-        public async Task<ActionResult<List<User>>> Update(User request)
+        public ActionResult<List<User>> Update(User request)
         {
-            var user = await _repository.GetById(request.Id);
+            var user = _userService.GetById(request.Id);
 
             if (user == null)
                 return BadRequest("User not found");
@@ -39,22 +34,22 @@ namespace ShoppingListAPI.Controllers
             user.Password = request.Password;
             user.Roles = request.Roles;
 
-            _repository.Update(user);
+            _userService.Update(user);
 
-            return Ok(_repository.GetAll());
+            return Ok(_userService.Get());
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<List<Category>>> Delete(Guid id)
+        public ActionResult<List<Category>> Delete(Guid id)
         {
-            var user = await _repository.GetById(id);
+            var user = _userService.GetById(id);
 
             if (user == null)
                 return BadRequest("User not found");
 
-            _repository.Delete(user);
+            _userService.Delete(user);
 
-            return Ok(_repository.GetAll());
+            return Ok(_userService.Get());
         }
     }
 }

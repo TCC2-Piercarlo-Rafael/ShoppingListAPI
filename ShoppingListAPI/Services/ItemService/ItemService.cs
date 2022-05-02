@@ -1,24 +1,22 @@
 ﻿using ShoppingListAPI.Dtos;
 using ShoppingListAPI.Models;
-using ShoppingListAPI.Repositories;
 
 namespace ShoppingListAPI.Services.ItemService
 {
     public class ItemService : IItemService
     {
-        private readonly IRepository<Category> _categoryRepository;
-        private readonly IRepository<Item> _repository;
         private readonly IUserService _userService;
-        public ItemService(IRepository<Item> repository, IRepository<Category> categoryRepository, IUserService userService)
+        private readonly DataContext _context;
+
+        public ItemService(DataContext context, IUserService userService)
         {
-            _repository = repository;
-            _categoryRepository = categoryRepository;
+            _context = context;
             _userService = userService;
         }
 
         public List<Item> Get()
         {
-            var categories = _categoryRepository.GetAll(c => c.UserId == _userService.GetId());
+            var categories = _context.Categories.Include(categories => categories.Items).Where(c => c.UserId == _userService.GetId());
 
             var items = new List<Item>();
             foreach (var category in categories)
@@ -29,7 +27,7 @@ namespace ShoppingListAPI.Services.ItemService
 
         public Item GetById(Guid id)
         {
-            return _repository.GetById(id).Result;
+            return _context.Items.Find(id);
         }
 
         public void Add(ItemDto request)
@@ -42,17 +40,20 @@ namespace ShoppingListAPI.Services.ItemService
                 Complete = false
             };
 
-            _repository.Add(item);
+            _context.Items.Add(item);
+            _context.SaveChanges();
         }
 
         public void Update(Item item)
         {
-            _repository.Update(item);
+            _context.Items.Update(item);
+            _context.SaveChanges();
         }
 
         public void Delete(Item item)
         {
-            _repository.Delete(item);
+            _context.Items.Remove(item);
+            _context.SaveChanges();
         }
     }
 }
